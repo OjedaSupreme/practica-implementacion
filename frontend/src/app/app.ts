@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 
 import { ESTADOS, PRIORIDADES, Tarea, etiqueta } from './models/tarea';
 
+// No se asusten por el subrayado rojo jejeje
+
 @Component({
   selector: 'app-root',
   imports: [FormsModule],
