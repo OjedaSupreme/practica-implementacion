@@ -1,8 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 
-import { ESTADOS, PRIORIDADES, Tarea, etiqueta } from './models/tarea';
+import { ESTADOS, NuevaTarea, PRIORIDADES, Tarea, etiqueta } from './models/tarea';
 
 // No se asusten por el subrayado rojo jejeje
 
@@ -23,6 +23,11 @@ export class App implements OnInit {
   readonly error = signal('');
   readonly guardando = signal(false);
   readonly errorGuardar = signal('');
+  readonly registrando = signal(false);
+  readonly errorRegistro = signal('');
+  readonly avisoRegistro = signal('');
+
+  nueva: NuevaTarea = this.nuevaVacia();
 
   estado = '';
   responsable = '';
@@ -42,6 +47,38 @@ export class App implements OnInit {
     this.estado = '';
     this.responsable = '';
     this.consultar(false);
+  }
+
+  registrar(formulario: NgForm): void {
+    const titulo = this.nueva.titulo.trim();
+    const responsable = this.nueva.responsable.trim();
+    if (!titulo || !responsable) {
+      this.errorRegistro.set('El título y el responsable son obligatorios.');
+      return;
+    }
+
+    this.registrando.set(true);
+    this.errorRegistro.set('');
+    this.avisoRegistro.set('');
+
+    const datos: NuevaTarea = { ...this.nueva, titulo, responsable, descripcion: this.nueva.descripcion.trim() };
+
+    this.http.post<Tarea>('/api/tareas', datos).subscribe({
+      next: (creada) => {
+        this.registrando.set(false);
+        this.avisoRegistro.set(`Tarea "${creada.titulo}" registrada.`);
+        this.responsables.update((nombres) =>
+          [...new Set([...nombres, creada.responsable])].sort((a, b) => a.localeCompare(b))
+        );
+        this.nueva = this.nuevaVacia();
+        formulario.resetForm(this.nueva);
+        this.consultar(false);
+      },
+      error: () => {
+        this.registrando.set(false);
+        this.errorRegistro.set('No se pudo registrar la tarea. Intenta de nuevo.');
+      },
+    });
   }
 
   etiquetaDe(valor: string): string {
@@ -167,6 +204,10 @@ export class App implements OnInit {
 
   private nombresDe(lista: Tarea[]): string[] {
     return [...new Set(lista.map((tarea) => tarea.responsable))].sort((a, b) => a.localeCompare(b));
+  }
+
+  private nuevaVacia(): NuevaTarea {
+    return { titulo: '', descripcion: '', estado: 'PENDIENTE', prioridad: 'MEDIA', responsable: '' };
   }
 
   private tareaBorrador(): Tarea {

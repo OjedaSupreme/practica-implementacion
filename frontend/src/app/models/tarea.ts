@@ -7,6 +7,8 @@ export interface Tarea {
   responsable: string;
 }
 
+export type NuevaTarea = Omit<Tarea, 'id'>;
+
 export const ESTADOS = [
   { valor: 'PENDIENTE', etiqueta: 'Pendiente' },
   { valor: 'EN_PROCESO', etiqueta: 'En proceso' },
