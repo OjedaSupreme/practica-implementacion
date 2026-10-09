@@ -151,3 +151,12 @@ button.guardar {
   background: #fff;
   box-sizing: border-box;
 }
+
+.select-rapido {
+  padding: 0.3rem 0.5rem;
+  font: inherit;
+  border: 1px solid #cfc5b6;
+  border-radius: 6px;
+  background: #fffcf8;
+  width: 100%;
+}

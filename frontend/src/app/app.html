@@ -89,9 +89,30 @@
               <tr>
                 <td>{{ tarea.titulo }}</td>
                 <td>{{ tarea.descripcion }}</td>
-                <td><span class="marca" [attr.data-tipo]="tarea.estado">{{ etiquetaDe(tarea.estado) }}</span></td>
-                <td>{{ etiquetaDe(tarea.prioridad) }}</td>
-                <td>{{ tarea.responsable }}</td>
+                <td>
+                  <select class="select-rapido" [value]="tarea.estado"
+                    (change)="cambiarEstado(tarea, $any($event.target).value)">
+                    @for (opcion of estados; track opcion.valor) {
+                      <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+                    }
+                  </select>
+                </td>
+                <td>
+                  <select class="select-rapido" [value]="tarea.prioridad"
+                    (change)="cambiarPrioridad(tarea, $any($event.target).value)">
+                    @for (opcion of prioridades; track opcion.valor) {
+                      <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+                    }
+                  </select>
+                </td>
+                <td>
+                  <select class="select-rapido" [value]="tarea.responsable"
+                    (change)="reasignar(tarea, $any($event.target).value)">
+                    @for (nombre of responsables(); track nombre) {
+                      <option [value]="nombre">{{ nombre }}</option>
+                    }
+                  </select>
+                </td>
                 <td class="acciones-fila">
                   <button type="button" class="secundario" (click)="abrirEdicion(tarea)">Editar</button>
                   <button type="button" class="eliminar" (click)="eliminar(tarea)">Eliminar</button>
