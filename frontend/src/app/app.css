@@ -114,3 +114,40 @@ th {
 .marca[data-tipo='TERMINADA'] {
   background: #d7eee3;
 }
+
+.acciones-fila {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.acciones-fila .aviso {
+  width: 100%;
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+}
+
+button.eliminar {
+  background: #8d2b2b;
+}
+
+button.guardar {
+  background: #1f6b4a;
+}
+
+.fila-edicion td {
+  background: #fffcf8;
+  vertical-align: middle;
+}
+
+.fila-edicion input,
+.fila-edicion select {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  font: inherit;
+  border: 1px solid #cfc5b6;
+  border-radius: 6px;
+  background: #fff;
+  box-sizing: border-box;
+}

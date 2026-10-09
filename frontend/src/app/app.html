@@ -45,17 +45,59 @@
             <th>Estado</th>
             <th>Prioridad</th>
             <th>Responsable</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           @for (tarea of tareas(); track tarea.id) {
-            <tr>
-              <td>{{ tarea.titulo }}</td>
-              <td>{{ tarea.descripcion }}</td>
-              <td><span class="marca" [attr.data-tipo]="tarea.estado">{{ etiquetaDe(tarea.estado) }}</span></td>
-              <td>{{ etiquetaDe(tarea.prioridad) }}</td>
-              <td>{{ tarea.responsable }}</td>
-            </tr>
+            @if (editando?.id === tarea.id) {
+              <tr class="fila-edicion">
+                <td>
+                  <input name="titulo-{{ tarea.id }}" [(ngModel)]="borrador.titulo" required />
+                </td>
+                <td>
+                  <input name="desc-{{ tarea.id }}" [(ngModel)]="borrador.descripcion" />
+                </td>
+                <td>
+                  <select name="estado-{{ tarea.id }}" [(ngModel)]="borrador.estado">
+                    @for (opcion of estados; track opcion.valor) {
+                      <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+                    }
+                  </select>
+                </td>
+                <td>
+                  <select name="prioridad-{{ tarea.id }}" [(ngModel)]="borrador.prioridad">
+                    @for (opcion of prioridades; track opcion.valor) {
+                      <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+                    }
+                  </select>
+                </td>
+                <td>
+                  <input name="resp-{{ tarea.id }}" [(ngModel)]="borrador.responsable" required />
+                </td>
+                <td class="acciones-fila">
+                  <button type="button" class="guardar" (click)="guardar()" [disabled]="guardando()">
+                    {{ guardando() ? 'Guardando…' : 'Guardar' }}
+                  </button>
+                  <button type="button" class="secundario" (click)="cancelarEdicion()">Cancelar</button>
+                  @if (errorGuardar()) {
+                    <p class="aviso error">{{ errorGuardar() }}</p>
+                  }
+                </td>
+              </tr>
+            } @else {
+              <tr>
+                <td>{{ tarea.titulo }}</td>
+                <td>{{ tarea.descripcion }}</td>
+                <td><span class="marca" [attr.data-tipo]="tarea.estado">{{ etiquetaDe(tarea.estado) }}</span></td>
+                <td>{{ etiquetaDe(tarea.prioridad) }}</td>
+                <td>{{ tarea.responsable }}</td>
+                <td class="acciones-fila">
+                  <button type="button" class="secundario" (click)="abrirEdicion(tarea)">Editar</button>
+                  <button type="button" class="eliminar" (click)="eliminar(tarea)">Eliminar</button>
+                </td>
+              </tr>
+            }
           }
         </tbody>
       </table>

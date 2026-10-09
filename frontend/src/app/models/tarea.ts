@@ -13,6 +13,12 @@ export const ESTADOS = [
   { valor: 'TERMINADA', etiqueta: 'Terminada' },
 ];
 
+export const PRIORIDADES = [
+  { valor: 'BAJA', etiqueta: 'Baja' },
+  { valor: 'MEDIA', etiqueta: 'Media' },
+  { valor: 'ALTA', etiqueta: 'Alta' },
+];
+
 const ETIQUETAS: Record<string, string> = {
   PENDIENTE: 'Pendiente',
   EN_PROCESO: 'En proceso',
