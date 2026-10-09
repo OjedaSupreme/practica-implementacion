@@ -4,6 +4,7 @@ Aplicación pequeña para registrar, consultar, modificar, eliminar y filtrar ta
 
 Este repositorio es la evidencia principal del proceso de control de versiones. Cada integrante trabaja en su propia rama, con commits, push, Pull Request, revisión e integración a `main`.
 
+
 ## Integrantes
 
 | Integrante | Actividad | Rama | Revisa el PR de |
@@ -58,7 +59,7 @@ La consola de H2 queda en `http://localhost:8080/h2-console`. JDBC URL: `jdbc:h2
   { "titulo": "Preparar reporte", "descripcion": "Capturas del PR", "estado": "PENDIENTE", "prioridad": "ALTA", "responsable": "Daniel" }
   ```
 
-## Flujo de trabajo
+## Flujo de trabajo.
 
 - `main` es la rama estable. Nadie hace push directo.
 - Las ramas salen de `main` actualizada: `git pull` y después `git checkout -b feature/filtros`.
