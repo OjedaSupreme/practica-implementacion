@@ -1,6 +1,60 @@
 <main>
   <h1>Tareas</h1>
 
+  <section class="registro">
+    <h2>Nueva tarea</h2>
+    <form #formRegistro="ngForm" class="form-registro" (ngSubmit)="registrar(formRegistro)">
+      <label>
+        Título
+        <input name="titulo" [(ngModel)]="nueva.titulo" required maxlength="255" />
+      </label>
+
+      <label>
+        Responsable
+        <input name="responsable" [(ngModel)]="nueva.responsable" required list="lista-responsables" />
+        <datalist id="lista-responsables">
+          @for (nombre of responsables(); track nombre) {
+            <option [value]="nombre"></option>
+          }
+        </datalist>
+      </label>
+
+      <label>
+        Estado
+        <select name="estado" [(ngModel)]="nueva.estado">
+          @for (opcion of estados; track opcion.valor) {
+            <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Prioridad
+        <select name="prioridad" [(ngModel)]="nueva.prioridad">
+          @for (opcion of prioridades; track opcion.valor) {
+            <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="ancho-completo">
+        Descripción
+        <textarea name="descripcion" [(ngModel)]="nueva.descripcion" rows="2" maxlength="1000"></textarea>
+      </label>
+
+      <div class="acciones ancho-completo">
+        <button type="submit" [disabled]="registrando() || formRegistro.invalid">
+          {{ registrando() ? 'Registrando…' : 'Registrar' }}
+        </button>
+        @if (errorRegistro()) {
+          <p class="aviso error" role="alert">{{ errorRegistro() }}</p>
+        } @else if (avisoRegistro()) {
+          <p class="aviso exito" role="status">{{ avisoRegistro() }}</p>
+        }
+      </div>
+    </form>
+  </section>
+
   <form (ngSubmit)="aplicar()">
     <label>
       Estado

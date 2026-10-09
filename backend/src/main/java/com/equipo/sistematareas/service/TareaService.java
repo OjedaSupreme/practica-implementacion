@@ -37,6 +37,27 @@ public class TareaService {
 		return tareaRepository.findAllByOrderByIdAsc();
 	}
 
+	public Tarea crear(Tarea datos) {
+		String titulo = limpiar(datos.getTitulo());
+		String responsable = limpiar(datos.getResponsable());
+		String descripcion = limpiar(datos.getDescripcion());
+
+		if (titulo.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El título es obligatorio");
+		}
+		if (responsable.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El responsable es obligatorio");
+		}
+		if (descripcion.length() > 1000) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La descripción admite máximo 1000 caracteres");
+		}
+
+		EstadoTarea estado = datos.getEstado() == null ? EstadoTarea.PENDIENTE : datos.getEstado();
+		PrioridadTarea prioridad = datos.getPrioridad() == null ? PrioridadTarea.MEDIA : datos.getPrioridad();
+
+		return tareaRepository.save(new Tarea(titulo, descripcion, estado, prioridad, responsable));
+	}
+
 	public Tarea actualizar(Long id, Tarea datos) {
 		Tarea tarea = tareaRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada"));
@@ -74,5 +95,9 @@ public class TareaService {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada"));
 		tarea.setResponsable(nuevoResponsable.trim());
 		return tareaRepository.save(tarea);
+	}
+
+	private String limpiar(String texto) {
+		return texto == null ? "" : texto.trim();
 	}
 }
