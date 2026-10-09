@@ -4,6 +4,8 @@ import { FormsModule, NgForm } from '@angular/forms';
 
 import { ESTADOS, NuevaTarea, PRIORIDADES, Tarea, etiqueta } from './models/tarea';
 
+// No se asusten por el subrayado rojo jejeje
+
 @Component({
   selector: 'app-root',
   imports: [FormsModule],
@@ -128,6 +130,47 @@ export class App implements OnInit {
       },
       error: () => {
         this.error.set('No se pudo eliminar la tarea. Intenta de nuevo.');
+      },
+    });
+  }
+
+  cambiarEstado(tarea: Tarea, nuevoEstado: string): void {
+    this.http.patch<Tarea>(`/api/tareas/${tarea.id}/estado`, { estado: nuevoEstado }).subscribe({
+      next: (actualizada) => {
+        this.tareas.update((lista) =>
+          lista.map((t) => (t.id === actualizada.id ? actualizada : t))
+        );
+      },
+      error: () => {
+        this.error.set('No se pudo cambiar el estado.');
+      },
+    });
+  }
+
+  cambiarPrioridad(tarea: Tarea, nuevaPrioridad: string): void {
+    this.http.patch<Tarea>(`/api/tareas/${tarea.id}/prioridad`, { prioridad: nuevaPrioridad }).subscribe({
+      next: (actualizada) => {
+        this.tareas.update((lista) =>
+          lista.map((t) => (t.id === actualizada.id ? actualizada : t))
+        );
+      },
+      error: () => {
+        this.error.set('No se pudo cambiar la prioridad.');
+      },
+    });
+  }
+
+  reasignar(tarea: Tarea, nuevoResponsable: string): void {
+    if (!nuevoResponsable.trim()) return;
+    this.http.patch<Tarea>(`/api/tareas/${tarea.id}/responsable`, { responsable: nuevoResponsable }).subscribe({
+      next: (actualizada) => {
+        this.tareas.update((lista) =>
+          lista.map((t) => (t.id === actualizada.id ? actualizada : t))
+        );
+        this.responsables.set(this.nombresDe(this.tareas()));
+      },
+      error: () => {
+        this.error.set('No se pudo reasignar la tarea.');
       },
     });
   }

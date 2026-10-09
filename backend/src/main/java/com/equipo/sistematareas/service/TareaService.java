@@ -76,6 +76,27 @@ public class TareaService {
 		tareaRepository.deleteById(id);
 	}
 
+	public Tarea actualizarEstado(Long id, String nuevoEstado) {
+		Tarea tarea = tareaRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada"));
+		tarea.setEstado(EstadoTarea.valueOf(nuevoEstado));
+		return tareaRepository.save(tarea);
+	}
+
+	public Tarea actualizarPrioridad(Long id, String nuevaPrioridad) {
+		Tarea tarea = tareaRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada"));
+		tarea.setPrioridad(PrioridadTarea.valueOf(nuevaPrioridad));
+		return tareaRepository.save(tarea);
+	}
+
+	public Tarea asignar(Long id, String nuevoResponsable) {
+		Tarea tarea = tareaRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada"));
+		tarea.setResponsable(nuevoResponsable.trim());
+		return tareaRepository.save(tarea);
+	}
+
 	private String limpiar(String texto) {
 		return texto == null ? "" : texto.trim();
 	}
