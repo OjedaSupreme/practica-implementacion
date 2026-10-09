@@ -10,8 +10,8 @@ Este repositorio es la evidencia principal del proceso de control de versiones. 
 | --- | --- | --- | --- |
 | 1 Daniel | Registro de tareas | `feature/registro-tareas` | Integrante 2 |
 | 2 Derek | Consulta de tareas | `feature/consulta-tareas` | Integrante 3 |
-| 3 (por definir) | Modificar y eliminar tareas | `feature/modificar-eliminar-tareas` | Integrante 4 |
-| 4 (por definir) | Estados, prioridades y asignación | `feature/estados-prioridades` | Integrante 5 |
+| 3 Susana | Modificar y eliminar tareas | `feature/modificar-eliminar-tareas` | Integrante 4 |
+| 4 Kevin | Estados, prioridades y asignación | `feature/estados-prioridades` | Integrante 5 |
 | 5 Jesus | Filtros por estado y responsable | `feature/filtros` | Integrante 1 |
 
 ## Tecnologías
