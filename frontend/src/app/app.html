@@ -1,0 +1,64 @@
+<main>
+  <h1>Tareas</h1>
+
+  <form (ngSubmit)="aplicar()">
+    <label>
+      Estado
+      <select name="estado" [(ngModel)]="estado">
+        <option value="">Todos</option>
+        @for (opcion of estados; track opcion.valor) {
+          <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Responsable
+      <select name="responsable" [(ngModel)]="responsable">
+        <option value="">Todos</option>
+        @for (nombre of responsables(); track nombre) {
+          <option [value]="nombre">{{ nombre }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="acciones">
+      <button type="submit">Aplicar</button>
+      <button type="button" class="secundario" (click)="limpiar()">Limpiar</button>
+    </div>
+  </form>
+
+  @if (error()) {
+    <p class="aviso error" role="alert">{{ error() }}</p>
+  } @else if (cargando()) {
+    <p class="aviso">Consultando tareas...</p>
+  } @else if (tareas().length === 0) {
+    <p class="aviso">No hay tareas con esos filtros.</p>
+  } @else {
+    <p class="conteo">{{ tareas().length }} tarea(s)</p>
+    <div class="tabla-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Prioridad</th>
+            <th>Responsable</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (tarea of tareas(); track tarea.id) {
+            <tr>
+              <td>{{ tarea.titulo }}</td>
+              <td>{{ tarea.descripcion }}</td>
+              <td><span class="marca" [attr.data-tipo]="tarea.estado">{{ etiquetaDe(tarea.estado) }}</span></td>
+              <td>{{ etiquetaDe(tarea.prioridad) }}</td>
+              <td>{{ tarea.responsable }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</main>
