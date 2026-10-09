@@ -37,6 +37,11 @@ public class TareaService {
 		return tareaRepository.findAllByOrderByIdAsc();
 	}
 
+	public Tarea consultarPorId(Long id) {
+		return tareaRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada"));
+	}
+
 	public Tarea actualizar(Long id, Tarea datos) {
 		Tarea tarea = tareaRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada"));
