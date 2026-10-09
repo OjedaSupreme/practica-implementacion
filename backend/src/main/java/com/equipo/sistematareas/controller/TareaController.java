@@ -16,6 +16,9 @@ import com.equipo.sistematareas.model.EstadoTarea;
 import com.equipo.sistematareas.model.Tarea;
 import com.equipo.sistematareas.service.TareaService;
 
+import java.util.Map;
+import org.springframework.web.bind.annotation.PatchMapping;
+
 @RestController
 @RequestMapping("/api/tareas")
 public class TareaController {
@@ -42,5 +45,20 @@ public class TareaController {
 	public ResponseEntity<Void> eliminar(@PathVariable Long id) {
 		tareaService.eliminar(id);
 		return ResponseEntity.noContent().build();
+	}
+
+	@PatchMapping("/{id}/estado")
+	public Tarea actualizarEstado(@PathVariable Long id, @RequestBody Map<String, String> body) {
+		return tareaService.actualizarEstado(id, body.get("estado"));
+	}
+
+	@PatchMapping("/{id}/prioridad")
+	public Tarea actualizarPrioridad(@PathVariable Long id, @RequestBody Map<String, String> body) {
+		return tareaService.actualizarPrioridad(id, body.get("prioridad"));
+	}
+
+	@PatchMapping("/{id}/responsable")
+	public Tarea asignar(@PathVariable Long id, @RequestBody Map<String, String> body) {
+		return tareaService.asignar(id, body.get("responsable"));
 	}
 }
