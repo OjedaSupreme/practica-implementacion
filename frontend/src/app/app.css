@@ -69,6 +69,46 @@ button {
   color: #8d2b2b;
 }
 
+.aviso.exito {
+  color: #1f6b4a;
+}
+
+.registro h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.form-registro input,
+.form-registro textarea {
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  font-weight: normal;
+  background: #fffcf8;
+  border: 1px solid #cfc5b6;
+  border-radius: 8px;
+}
+
+.form-registro textarea {
+  resize: vertical;
+}
+
+.form-registro .ancho-completo {
+  grid-column: 1 / -1;
+}
+
+.form-registro .acciones {
+  align-items: center;
+}
+
+.form-registro .aviso {
+  margin: 0;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .tabla-wrap {
   overflow-x: auto;
   background: #fff;
@@ -150,4 +190,13 @@ button.guardar {
   border-radius: 6px;
   background: #fff;
   box-sizing: border-box;
+}
+
+.select-rapido {
+  padding: 0.3rem 0.5rem;
+  font: inherit;
+  border: 1px solid #cfc5b6;
+  border-radius: 6px;
+  background: #fffcf8;
+  width: 100%;
 }
