@@ -10,11 +10,13 @@ export class TareaService {
 
   listar(estado = '', responsable = ''): Observable<Tarea[]> {
     let params = new HttpParams();
-    if (estado) {
-      params = params.set('estado', estado);
+    const estadoLimpio = estado.trim();
+    const responsableLimpio = responsable.trim();
+    if (estadoLimpio) {
+      params = params.set('estado', estadoLimpio);
     }
-    if (responsable) {
-      params = params.set('responsable', responsable);
+    if (responsableLimpio) {
+      params = params.set('responsable', responsableLimpio);
     }
 
     return this.http.get<Tarea[]>('/api/tareas', { params });

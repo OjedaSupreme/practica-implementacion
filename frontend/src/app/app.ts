@@ -119,6 +119,18 @@ export class App implements OnInit {
     return etiqueta(valor);
   }
 
+  resumenFiltro(): string {
+    const partes: string[] = [];
+    if (this.estado) {
+      partes.push(`estado ${etiqueta(this.estado)}`);
+    }
+    const responsable = this.responsable.trim();
+    if (responsable) {
+      partes.push(`responsable ${responsable}`);
+    }
+    return partes.join(' y ');
+  }
+
   abrirEdicion(tarea: Tarea): void {
     this.editando = tarea;
     this.borrador = { ...tarea };

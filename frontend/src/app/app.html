@@ -115,9 +115,17 @@
   } @else if (cargando()) {
     <p class="aviso">Consultando tareas...</p>
   } @else if (tareas().length === 0) {
-    <p class="aviso">No hay tareas con esos filtros.</p>
+    <p class="aviso">
+      @if (resumenFiltro()) {
+        No hay tareas con {{ resumenFiltro() }}.
+      } @else {
+        No hay tareas registradas.
+      }
+    </p>
   } @else {
-    <p class="conteo">{{ tareas().length }} tarea(s)</p>
+    <p class="conteo">
+      {{ tareas().length }} tarea(s)@if (resumenFiltro()) { con {{ resumenFiltro() }}}
+    </p>
     <div class="tabla-wrap">
       <table>
         <thead>
@@ -172,26 +180,26 @@
                 <td>{{ tarea.titulo }}</td>
                 <td>{{ tarea.descripcion }}</td>
                 <td>
-                  <select class="select-rapido" [value]="tarea.estado"
-                    (change)="cambiarEstado(tarea, $any($event.target).value)">
+                  <select class="select-rapido" [ngModel]="tarea.estado" name="estado-rapido-{{ tarea.id }}"
+                    (ngModelChange)="cambiarEstado(tarea, $event)">
                     @for (opcion of estados; track opcion.valor) {
-                      <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+                      <option [ngValue]="opcion.valor">{{ opcion.etiqueta }}</option>
                     }
                   </select>
                 </td>
                 <td>
-                  <select class="select-rapido" [value]="tarea.prioridad"
-                    (change)="cambiarPrioridad(tarea, $any($event.target).value)">
+                  <select class="select-rapido" [ngModel]="tarea.prioridad" name="prioridad-rapida-{{ tarea.id }}"
+                    (ngModelChange)="cambiarPrioridad(tarea, $event)">
                     @for (opcion of prioridades; track opcion.valor) {
-                      <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+                      <option [ngValue]="opcion.valor">{{ opcion.etiqueta }}</option>
                     }
                   </select>
                 </td>
                 <td>
-                  <select class="select-rapido" [value]="tarea.responsable"
-                    (change)="reasignar(tarea, $any($event.target).value)">
+                  <select class="select-rapido" [ngModel]="tarea.responsable" name="responsable-rapido-{{ tarea.id }}"
+                    (ngModelChange)="reasignar(tarea, $event)">
                     @for (nombre of responsables(); track nombre) {
-                      <option [value]="nombre">{{ nombre }}</option>
+                      <option [ngValue]="nombre">{{ nombre }}</option>
                     }
                   </select>
                 </td>
