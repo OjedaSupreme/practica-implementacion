@@ -53,11 +53,25 @@ La consola de H2 queda en `http://localhost:8080/h2-console`. JDBC URL: `jdbc:h2
 - `GET /api/tareas?estado=PENDIENTE` filtra por estado. Valores: `PENDIENTE`, `EN_PROCESO`, `TERMINADA`.
 - `GET /api/tareas?responsable=Nombre` filtra por responsable.
 - Los dos parámetros se pueden usar juntos.
-- `POST /api/tareas` registra una tarea y responde `201 Created`. `titulo` y `responsable` son obligatorios; si no se envían `estado` o `prioridad`, quedan en `PENDIENTE` y `MEDIA`. Si faltan datos obligatorios o un valor no es válido, responde `400`.
+- `POST /api/tareas` registra una tarea y responde `201 Created` con la tarea creada y el encabezado `Location`.
 
   ```json
   { "titulo": "Preparar reporte", "descripcion": "Capturas del PR", "estado": "PENDIENTE", "prioridad": "ALTA", "responsable": "Daniel" }
   ```
+
+  Reglas de validación del registro:
+
+  | Campo | Regla |
+  | --- | --- |
+  | `titulo` | Obligatorio, máximo 120 caracteres. |
+  | `responsable` | Obligatorio. |
+  | `descripcion` | Opcional, máximo 1000 caracteres. |
+  | `estado` | Opcional: `PENDIENTE`, `EN_PROCESO` o `TERMINADA`. Si no se envía, queda en `PENDIENTE`. |
+  | `prioridad` | Opcional: `BAJA`, `MEDIA` o `ALTA`. Si no se envía, queda en `MEDIA`. |
+
+  - A `titulo`, `responsable` y `descripcion` se les quitan los espacios del inicio y del final antes de validar y guardar. Un texto con solo espacios cuenta como vacío.
+  - Si se envía un `id`, se ignora: el registro siempre crea una tarea nueva.
+  - Si una regla no se cumple, responde `400` y el campo `message` explica el motivo, por ejemplo `"El título es obligatorio"`. El formulario de registro muestra ese mensaje.
 
 ## Flujo de trabajo.
 
