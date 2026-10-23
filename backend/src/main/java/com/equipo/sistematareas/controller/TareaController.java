@@ -31,11 +31,30 @@ public class TareaController {
 		this.tareaService = tareaService;
 	}
 
+	/**
+	 * Consulta las tareas y permite filtrar opcionalmente por estado y responsable.
+	 *
+	 * @param estado estado por el que se desea filtrar
+	 * @param responsable responsable por el que se desea filtrar
+	 * @return tareas encontradas, o una lista vacía si no hay coincidencias
+	 */
 	@GetMapping
 	public List<Tarea> listar(
 			@RequestParam(required = false) EstadoTarea estado,
 			@RequestParam(required = false) String responsable) {
 		return tareaService.listar(estado, responsable);
+	}
+
+	/**
+	 * Consulta una tarea por su identificador.
+	 *
+	 * @param id identificador de la tarea
+	 * @return tarea encontrada con estado HTTP 200
+	 * @throws org.springframework.web.server.ResponseStatusException si la tarea no existe (HTTP 404)
+	 */
+	@GetMapping("/{id}")
+	public ResponseEntity<Tarea> consultarPorId(@PathVariable Long id) {
+		return ResponseEntity.ok(tareaService.consultarPorId(id));
 	}
 
 	@PostMapping

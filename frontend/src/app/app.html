@@ -1,6 +1,34 @@
 <main>
   <h1>Tareas</h1>
 
+  <section class="consulta-id">
+    <h2>Consultar por identificador</h2>
+    <form (ngSubmit)="consultarPorId()">
+      <label>
+        ID de tarea
+        <input
+          type="number"
+          name="idConsulta"
+          [(ngModel)]="idConsulta"
+          min="1"
+          step="1"
+          required
+        />
+      </label>
+      <button type="submit" [disabled]="cargandoConsultaId()">
+        {{ cargandoConsultaId() ? 'Consultando…' : 'Consultar' }}
+      </button>
+    </form>
+    @if (errorConsultaId()) {
+      <p class="aviso error" role="alert">{{ errorConsultaId() }}</p>
+    } @else if (tareaConsultada(); as tarea) {
+      <p class="aviso" role="status">
+        Tarea #{{ tarea.id }}: {{ tarea.titulo }} — {{ etiquetaDe(tarea.estado) }},
+        {{ etiquetaDe(tarea.prioridad) }}, responsable: {{ tarea.responsable }}
+      </p>
+    }
+  </section>
+
   <section class="registro">
     <h2>Nueva tarea</h2>
     <form #formRegistro="ngForm" class="form-registro" (ngSubmit)="registrar(formRegistro)">

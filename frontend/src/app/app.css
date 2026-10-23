@@ -78,6 +78,27 @@ button {
   font-size: 1.1rem;
 }
 
+.consulta-id h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.consulta-id form {
+  grid-template-columns: minmax(180px, 1fr) auto;
+}
+
+.consulta-id input {
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  background: #fffcf8;
+  border: 1px solid #cfc5b6;
+  border-radius: 8px;
+}
+
+.consulta-id .aviso {
+  margin-top: 0.65rem;
+}
+
 .form-registro input,
 .form-registro textarea {
   padding: 0.55rem 0.7rem;
