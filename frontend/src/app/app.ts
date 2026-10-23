@@ -40,6 +40,18 @@ export class App implements OnInit {
     return etiqueta(valor);
   }
 
+  resumenFiltro(): string {
+    const partes: string[] = [];
+    if (this.estado) {
+      partes.push(`estado ${etiqueta(this.estado)}`);
+    }
+    const responsable = this.responsable.trim();
+    if (responsable) {
+      partes.push(`responsable ${responsable}`);
+    }
+    return partes.join(' y ');
+  }
+
   private consultar(guardarResponsables: boolean): void {
     this.cargando.set(true);
     this.error.set('');
@@ -48,8 +60,9 @@ export class App implements OnInit {
     if (this.estado) {
       params = params.set('estado', this.estado);
     }
-    if (this.responsable) {
-      params = params.set('responsable', this.responsable);
+    const responsable = this.responsable.trim();
+    if (responsable) {
+      params = params.set('responsable', responsable);
     }
 
     this.http.get<Tarea[]>('/api/tareas', { params }).subscribe({

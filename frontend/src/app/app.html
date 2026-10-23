@@ -33,9 +33,17 @@
   } @else if (cargando()) {
     <p class="aviso">Consultando tareas...</p>
   } @else if (tareas().length === 0) {
-    <p class="aviso">No hay tareas con esos filtros.</p>
+    <p class="aviso">
+      @if (resumenFiltro()) {
+        No hay tareas con {{ resumenFiltro() }}.
+      } @else {
+        No hay tareas registradas.
+      }
+    </p>
   } @else {
-    <p class="conteo">{{ tareas().length }} tarea(s)</p>
+    <p class="conteo">
+      {{ tareas().length }} tarea(s)@if (resumenFiltro()) { con {{ resumenFiltro() }}}
+    </p>
     <div class="tabla-wrap">
       <table>
         <thead>
