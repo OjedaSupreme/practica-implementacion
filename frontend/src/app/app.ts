@@ -4,8 +4,6 @@ import { FormsModule, NgForm } from '@angular/forms';
 
 import { ESTADOS, NuevaTarea, PRIORIDADES, Tarea, etiqueta } from './models/tarea';
 
-// No se asusten por el subrayado rojo jejeje
-
 @Component({
   selector: 'app-root',
   imports: [FormsModule],
@@ -180,11 +178,12 @@ export class App implements OnInit {
     this.error.set('');
 
     let params = new HttpParams();
+    const responsable = this.responsable.trim();
     if (this.estado) {
       params = params.set('estado', this.estado);
     }
-    if (this.responsable) {
-      params = params.set('responsable', this.responsable);
+    if (responsable) {
+      params = params.set('responsable', responsable);
     }
 
     this.http.get<Tarea[]>('/api/tareas', { params }).subscribe({
