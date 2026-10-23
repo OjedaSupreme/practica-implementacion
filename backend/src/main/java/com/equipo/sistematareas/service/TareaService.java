@@ -20,6 +20,13 @@ public class TareaService {
 		this.tareaRepository = tareaRepository;
 	}
 
+	/**
+	 * Devuelve todas las tareas o las filtra por estado y/o responsable.
+	 *
+	 * @param estado estado opcional para filtrar
+	 * @param responsable responsable opcional para filtrar
+	 * @return tareas ordenadas por identificador ascendente
+	 */
 	public List<Tarea> listar(EstadoTarea estado, String responsable) {
 		String responsableLimpio = responsable == null ? "" : responsable.trim();
 		boolean tieneEstado = estado != null;
@@ -37,9 +44,18 @@ public class TareaService {
 		return tareaRepository.findAllByOrderByIdAsc();
 	}
 
+	/**
+	 * Busca una tarea por identificador.
+	 *
+	 * @param id identificador de la tarea
+	 * @return tarea encontrada
+	 * @throws ResponseStatusException con estado HTTP 404 si no existe
+	 */
 	public Tarea consultarPorId(Long id) {
 		return tareaRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada"));
+	}
+
 	public Tarea crear(Tarea datos) {
 		String titulo = limpiar(datos.getTitulo());
 		String responsable = limpiar(datos.getResponsable());

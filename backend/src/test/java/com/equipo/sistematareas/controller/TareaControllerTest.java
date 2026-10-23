@@ -50,6 +50,23 @@ class TareaControllerTest {
 	}
 
 	@Test
+	void consultaTareaExistentePorId() throws Exception {
+		Tarea tarea = tareaRepository.findAllByOrderByIdAsc().get(0);
+
+		mockMvc.perform(get("/api/tareas/{id}", tarea.getId()))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(tarea.getId().intValue())))
+				.andExpect(jsonPath("$.titulo", is("Uno")))
+				.andExpect(jsonPath("$.responsable", is("Ana")));
+	}
+
+	@Test
+	void consultaTareaInexistenteResponde404() throws Exception {
+		mockMvc.perform(get("/api/tareas/{id}", 999999L))
+				.andExpect(status().isNotFound());
+	}
+
+	@Test
 	void filtraPorEstadoPendiente() throws Exception {
 		mockMvc.perform(get("/api/tareas").param("estado", "PENDIENTE"))
 				.andExpect(status().isOk())
