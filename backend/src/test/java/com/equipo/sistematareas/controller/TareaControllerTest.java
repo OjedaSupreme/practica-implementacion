@@ -160,4 +160,52 @@ class TareaControllerTest {
 								"""))
 				.andExpect(status().isBadRequest());
 	}
+
+	@Test
+	void registroConResponsableSoloEspaciosResponde400() throws Exception {
+		mockMvc.perform(post("/api/tareas")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{"titulo": "Nueve", "responsable": "   "}
+								"""))
+				.andExpect(status().isBadRequest());
+
+		assertEquals(3, tareaRepository.count());
+	}
+
+	@Test
+	void registroConDescripcionDeMasDe1000CaracteresResponde400() throws Exception {
+		mockMvc.perform(post("/api/tareas")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{"titulo": "Diez", "responsable": "Ana", "descripcion": "%s"}
+								""".formatted("a".repeat(1001))))
+				.andExpect(status().isBadRequest());
+
+		assertEquals(3, tareaRepository.count());
+	}
+
+	@Test
+	void registroConDescripcionDe1000CaracteresSeAcepta() throws Exception {
+		mockMvc.perform(post("/api/tareas")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{"titulo": "Once", "responsable": "Ana", "descripcion": "%s"}
+								""".formatted("a".repeat(1000))))
+				.andExpect(status().isCreated());
+	}
+
+	@Test
+	void registroGuardaResponsableYDescripcionSinEspaciosSobrantes() throws Exception {
+		mockMvc.perform(post("/api/tareas")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{"titulo": "Doce", "responsable": "  Luis  ", "descripcion": "  revisar  "}
+								"""))
+				.andExpect(status().isCreated());
+
+		Tarea guardada = tareaRepository.findAllByOrderByIdAsc().get(3);
+		assertEquals("Luis", guardada.getResponsable());
+		assertEquals("revisar", guardada.getDescripcion());
+	}
 }
