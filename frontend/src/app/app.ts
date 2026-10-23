@@ -1,8 +1,9 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 
 import { ESTADOS, NuevaTarea, PRIORIDADES, Tarea, etiqueta } from './models/tarea';
+import { TareaService } from './services/tarea.service';
 
 // No se asusten por el subrayado rojo jejeje
 
@@ -14,6 +15,7 @@ import { ESTADOS, NuevaTarea, PRIORIDADES, Tarea, etiqueta } from './models/tare
 })
 export class App implements OnInit {
   private readonly http = inject(HttpClient);
+  private readonly tareaService = inject(TareaService);
 
   readonly estados = ESTADOS;
   readonly prioridades = PRIORIDADES;
@@ -26,11 +28,15 @@ export class App implements OnInit {
   readonly registrando = signal(false);
   readonly errorRegistro = signal('');
   readonly avisoRegistro = signal('');
+  readonly tareaConsultada = signal<Tarea | null>(null);
+  readonly cargandoConsultaId = signal(false);
+  readonly errorConsultaId = signal('');
 
   nueva: NuevaTarea = this.nuevaVacia();
 
   estado = '';
   responsable = '';
+  idConsulta = '';
 
   editando: Tarea | null = null;
   borrador: Tarea = this.tareaBorrador();
@@ -47,6 +53,34 @@ export class App implements OnInit {
     this.estado = '';
     this.responsable = '';
     this.consultar(false);
+  }
+
+  consultarPorId(): void {
+    const id = Number(this.idConsulta);
+    if (!Number.isInteger(id) || id <= 0) {
+      this.tareaConsultada.set(null);
+      this.errorConsultaId.set('Ingresa un identificador válido.');
+      return;
+    }
+
+    this.cargandoConsultaId.set(true);
+    this.errorConsultaId.set('');
+    this.tareaConsultada.set(null);
+
+    this.tareaService.consultarPorId(id).subscribe({
+      next: (tarea) => {
+        this.tareaConsultada.set(tarea);
+        this.cargandoConsultaId.set(false);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.cargandoConsultaId.set(false);
+        this.errorConsultaId.set(
+          error.status === 404
+            ? 'No existe una tarea con ese identificador.'
+            : 'No se pudo consultar la tarea. Confirma que el backend esté disponible.'
+        );
+      },
+    });
   }
 
   registrar(formulario: NgForm): void {
@@ -179,15 +213,7 @@ export class App implements OnInit {
     this.cargando.set(true);
     this.error.set('');
 
-    let params = new HttpParams();
-    if (this.estado) {
-      params = params.set('estado', this.estado);
-    }
-    if (this.responsable) {
-      params = params.set('responsable', this.responsable);
-    }
-
-    this.http.get<Tarea[]>('/api/tareas', { params }).subscribe({
+    this.tareaService.listar(this.estado, this.responsable).subscribe({
       next: (lista) => {
         this.tareas.set(lista);
         if (guardarResponsables) {
