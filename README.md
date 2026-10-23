@@ -19,15 +19,15 @@ Este repositorio es la evidencia principal del proceso de control de versiones. 
 
 - Frontend: Angular
 - Backend: Spring Boot (API REST)
-- Java 17
-- Node.js
+- Java 21
+- Node.js 20.19 o superior (también sirve Node.js 22)
 - Base de datos: H2 en memoria
 - Plataforma: GitHub
 - Flujo: GitHub Flow
 
 ## Cómo ejecutarlo
 
-Hacen falta dos terminales.
+Hacen falta Java 21, Node.js y dos terminales. La primera vez Maven y npm descargan dependencias, así que hace falta internet.
 
 Backend, en el puerto 8080:
 
@@ -36,10 +36,11 @@ cd backend
 .\mvnw.cmd spring-boot:run
 ```
 
-Frontend, en el puerto 4200:
+Frontend, en el puerto 4200. `npm install` solo hace falta la primera vez:
 
 ```powershell
 cd frontend
+npm install
 npm start
 ```
 
