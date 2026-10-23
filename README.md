@@ -49,10 +49,25 @@ La consola de H2 queda en `http://localhost:8080/h2-console`. JDBC URL: `jdbc:h2
 
 ## API
 
-- `GET /api/tareas` devuelve todas las tareas.
+- `GET /api/tareas` devuelve una lista ordenada por identificador ascendente. Acepta los filtros opcionales `estado` y `responsable`; sin coincidencias responde `200 OK` con `[]`.
 - `GET /api/tareas?estado=PENDIENTE` filtra por estado. Valores: `PENDIENTE`, `EN_PROCESO`, `TERMINADA`.
 - `GET /api/tareas?responsable=Nombre` filtra por responsable.
 - Los dos parámetros se pueden usar juntos.
+- `GET /api/tareas/{id}` devuelve una tarea por su identificador con `200 OK`. Si no existe, responde `404 Not Found` con el mensaje `Tarea no encontrada`.
+
+  La respuesta de ambos endpoints de consulta usa los campos `id` (número), `titulo` (texto), `descripcion` (texto), `estado` (`PENDIENTE`, `EN_PROCESO` o `TERMINADA`), `prioridad` (`BAJA`, `MEDIA` o `ALTA`) y `responsable` (texto). Ejemplo:
+
+  ```json
+  {
+    "id": 1,
+    "titulo": "Preparar reporte",
+    "descripcion": "Capturas del PR",
+    "estado": "PENDIENTE",
+    "prioridad": "ALTA",
+    "responsable": "Daniel"
+  }
+  ```
+
 - `POST /api/tareas` registra una tarea y responde `201 Created`. `titulo` y `responsable` son obligatorios; si no se envían `estado` o `prioridad`, quedan en `PENDIENTE` y `MEDIA`. Si faltan datos obligatorios o un valor no es válido, responde `400`.
 
   ```json
