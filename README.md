@@ -70,6 +70,24 @@ La consola de H2 queda en `http://localhost:8080/h2-console`. JDBC URL: `jdbc:h2
 - La integración usa **Create a merge commit**. El autor combina después de la aprobación.
 - La rama se elimina al integrarse.
 
+## Filtros
+
+La consulta acepta `estado` y `responsable` por separado o juntos.
+
+- El responsable se compara sin distinguir mayúsculas y se ignoran los espacios al inicio y al final. `ana` y `  Ana  ` devuelven las tareas de Ana.
+- Si `responsable` llega vacío o solo con espacios, no filtra por responsable.
+- Un `estado` que no existe, por ejemplo `URGENTE`, responde `400`.
+- Si ninguna tarea coincide, la respuesta es una lista vacía y la pantalla muestra «No hay tareas con esos filtros.»
+
+En la pantalla, **Aplicar** consulta con los dos selectores y **Limpiar** los deja en «Todos».
+
+Para correr solo las pruebas de filtros:
+
+```powershell
+cd backend
+.\mvnw.cmd -Dtest=FiltroTareasTest test
+```
+
 ## Estructura
 
 ```text
