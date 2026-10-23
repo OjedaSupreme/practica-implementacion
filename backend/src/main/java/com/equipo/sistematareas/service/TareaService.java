@@ -14,6 +14,8 @@ import com.equipo.sistematareas.repository.TareaRepository;
 @Service
 public class TareaService {
 
+	private static final int MAX_TITULO = 120;
+
 	private final TareaRepository tareaRepository;
 
 	public TareaService(TareaRepository tareaRepository) {
@@ -49,6 +51,10 @@ public class TareaService {
 
 		if (titulo.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El título es obligatorio");
+		}
+		if (titulo.length() > MAX_TITULO) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"El título admite máximo " + MAX_TITULO + " caracteres");
 		}
 		if (responsable.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El responsable es obligatorio");

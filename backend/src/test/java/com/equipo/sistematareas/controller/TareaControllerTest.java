@@ -208,4 +208,26 @@ class TareaControllerTest {
 		assertEquals("Luis", guardada.getResponsable());
 		assertEquals("revisar", guardada.getDescripcion());
 	}
+
+	@Test
+	void registroConTituloDeMasDe120CaracteresResponde400() throws Exception {
+		mockMvc.perform(post("/api/tareas")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{"titulo": "%s", "responsable": "Ana"}
+								""".formatted("t".repeat(121))))
+				.andExpect(status().isBadRequest());
+
+		assertEquals(3, tareaRepository.count());
+	}
+
+	@Test
+	void registroConTituloDe120CaracteresSeAcepta() throws Exception {
+		mockMvc.perform(post("/api/tareas")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{"titulo": "%s", "responsable": "Ana"}
+								""".formatted("t".repeat(120))))
+				.andExpect(status().isCreated());
+	}
 }
