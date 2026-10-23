@@ -92,6 +92,13 @@ button {
   resize: vertical;
 }
 
+.form-registro .contador {
+  justify-self: end;
+  font-weight: normal;
+  font-size: 0.78rem;
+  color: #6b645b;
+}
+
 .form-registro .ancho-completo {
   grid-column: 1 / -1;
 }

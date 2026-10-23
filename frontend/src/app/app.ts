@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 
@@ -26,6 +26,8 @@ export class App implements OnInit {
   readonly registrando = signal(false);
   readonly errorRegistro = signal('');
   readonly avisoRegistro = signal('');
+  readonly maxTitulo = 120;
+  readonly maxDescripcion = 1000;
 
   nueva: NuevaTarea = this.nuevaVacia();
 
@@ -49,10 +51,14 @@ export class App implements OnInit {
     this.consultar(false);
   }
 
+  faltanDatosRegistro(): boolean {
+    return !this.nueva.titulo.trim() || !this.nueva.responsable.trim();
+  }
+
   registrar(formulario: NgForm): void {
     const titulo = this.nueva.titulo.trim();
     const responsable = this.nueva.responsable.trim();
-    if (!titulo || !responsable) {
+    if (this.faltanDatosRegistro()) {
       this.errorRegistro.set('El título y el responsable son obligatorios.');
       return;
     }
@@ -74,9 +80,9 @@ export class App implements OnInit {
         formulario.resetForm(this.nueva);
         this.consultar(false);
       },
-      error: () => {
+      error: (respuesta: HttpErrorResponse) => {
         this.registrando.set(false);
-        this.errorRegistro.set('No se pudo registrar la tarea. Intenta de nuevo.');
+        this.errorRegistro.set(respuesta.error?.message || 'No se pudo registrar la tarea. Intenta de nuevo.');
       },
     });
   }

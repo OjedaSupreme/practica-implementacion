@@ -6,7 +6,8 @@
     <form #formRegistro="ngForm" class="form-registro" (ngSubmit)="registrar(formRegistro)">
       <label>
         Título
-        <input name="titulo" [(ngModel)]="nueva.titulo" required maxlength="255" />
+        <input name="titulo" [(ngModel)]="nueva.titulo" required [maxlength]="maxTitulo" />
+        <small class="contador">{{ nueva.titulo.length }}/{{ maxTitulo }}</small>
       </label>
 
       <label>
@@ -39,11 +40,12 @@
 
       <label class="ancho-completo">
         Descripción
-        <textarea name="descripcion" [(ngModel)]="nueva.descripcion" rows="2" maxlength="1000"></textarea>
+        <textarea name="descripcion" [(ngModel)]="nueva.descripcion" rows="2" [maxlength]="maxDescripcion"></textarea>
+        <small class="contador">{{ nueva.descripcion.length }}/{{ maxDescripcion }}</small>
       </label>
 
       <div class="acciones ancho-completo">
-        <button type="submit" [disabled]="registrando() || formRegistro.invalid">
+        <button type="submit" [disabled]="registrando() || formRegistro.invalid || faltanDatosRegistro()">
           {{ registrando() ? 'Registrando…' : 'Registrar' }}
         </button>
         @if (errorRegistro()) {
