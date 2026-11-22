@@ -8,6 +8,7 @@ databases:
     databaseName: tareasdb
     user: tareas
     postgresMajorVersion: "16"
+    ipAllowList: []   # sin acceso desde Internet: solo los servicios de Render en la red privada
 
 services:
   # Servidor de aplicaciones: API REST Spring Boot (backend/Dockerfile)
