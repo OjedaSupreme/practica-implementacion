@@ -141,7 +141,7 @@ Variables de entorno:
 | `DATABASE_URL` | API | Cadena interna de PostgreSQL (la convierte `docker-entrypoint.sh`). |
 | `JWT_SECRET` | API | Generada por Render. |
 | `CORS_ORIGINS` | API | URL del frontend, p. ej. `https://tareas-ojeda-web.onrender.com`. |
-| `APP_ADMIN_PASSWORD`, `APP_USUARIO_PASSWORD` | API | Contraseñas iniciales de `admin` y `jesus`. |
+| `APP_ADMIN_PASSWORD`, `APP_USUARIO_PASSWORD` | API | Contraseñas iniciales de `admin` y `jesus`, generadas por Render. |
 | `API_URL` | Web | URL de la API, p. ej. `https://tareas-ojeda-api.onrender.com`. |
 
 ## Guía de pruebas de funcionamiento

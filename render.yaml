@@ -27,12 +27,12 @@ services:
           property: connectionString
       - key: JWT_SECRET                # clave aleatoria de 256 bits generada por Render
         generateValue: true
-      - key: CORS_ORIGINS              # dominio público del frontend, p. ej. https://tareas-ojeda-web.onrender.com
-        sync: false
-      - key: APP_ADMIN_PASSWORD        # se capturan en el panel al crear el servicio
-        sync: false
+      - key: CORS_ORIGINS              # dominio público del frontend (mismo origen que ve el navegador)
+        value: https://tareas-ojeda-web.onrender.com
+      - key: APP_ADMIN_PASSWORD        # contraseñas iniciales aleatorias; se consultan en el panel de Render
+        generateValue: true
       - key: APP_USUARIO_PASSWORD
-        sync: false
+        generateValue: true
 
   # Servidor web: Nginx con Angular y proxy inverso hacia la API (frontend/Dockerfile)
   - type: web
@@ -45,5 +45,5 @@ services:
     dockerContext: ./frontend
     healthCheckPath: /
     envVars:
-      - key: API_URL                   # URL pública (HTTPS) de tareas-ojeda-api, p. ej. https://tareas-ojeda-api.onrender.com
-        sync: false
+      - key: API_URL                   # URL pública (HTTPS) del servicio tareas-ojeda-api
+        value: https://tareas-ojeda-api.onrender.com
