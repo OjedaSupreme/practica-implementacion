@@ -17,8 +17,8 @@ services:
     plan: free
     region: oregon
     rootDir: backend
-    dockerfilePath: ./backend/Dockerfile   # rutas relativas a la raíz del repositorio
-    dockerContext: ./backend
+    dockerfilePath: ./Dockerfile   # con rootDir, las rutas son relativas a esa carpeta
+    dockerContext: .
     healthCheckPath: /actuator/health
     envVars:
       - key: DATABASE_URL              # cadena interna de PostgreSQL; docker-entrypoint.sh la convierte a JDBC
@@ -41,8 +41,8 @@ services:
     plan: free
     region: oregon
     rootDir: frontend
-    dockerfilePath: ./frontend/Dockerfile
-    dockerContext: ./frontend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /
     envVars:
       - key: API_URL                   # URL pública (HTTPS) del servicio tareas-ojeda-api
