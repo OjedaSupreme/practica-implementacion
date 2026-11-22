@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.equipo.sistematareas.model.EstadoTarea;
@@ -24,6 +25,7 @@ import com.equipo.sistematareas.repository.TareaRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@WithMockUser(username = "admin", roles = "ADMIN") // las rutas de /api/tareas ahora exigen autenticación
 class OperacionesTareaTest {
 
 	@Autowired

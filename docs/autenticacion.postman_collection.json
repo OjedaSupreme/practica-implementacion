@@ -1,0 +1,453 @@
+{
+  "info": {
+    "name": "Sistema de tareas - Autenticación JWT",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Pruebas de seguridad de la autenticación (login, token ausente, inválido, expirado, rol, refresh y logout)."
+  },
+  "item": [
+    {
+      "name": "01 Login ADMIN",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin123*\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('tokenAdmin', pm.response.json().accessToken);",
+              "pm.test('Cookie refresh_token presente', () => pm.expect(pm.cookies.has('refresh_token')).to.be.true);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Login contraseña incorrecta",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"incorrecta\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+              "pm.test('codigo = CREDENCIALES_INVALIDAS', () => pm.expect(pm.response.json().codigo).to.eql('CREDENCIALES_INVALIDAS'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 GET tareas SIN token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tareas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "tareas"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+              "pm.test('codigo = SIN_CREDENCIALES', () => pm.expect(pm.response.json().codigo).to.eql('SIN_CREDENCIALES'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 GET tareas token INVÁLIDO (firma falsa)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJhZDY1OThkZC04MjAzLTQ0MWItYWM5My1lMzBmZjkxZGE5MmMiLCJpc3MiOiJzaXN0ZW1hLXRhcmVhcyIsInN1YiI6ImF0YWNhbnRlIiwicm9sIjoiQURNSU4iLCJpYXQiOjE3OTQ5NjAwMDAsImV4cCI6MTg5MzQ1NjAwMH0.PG3vhqnYR7oZE6_WxqAXP6WBT0mvOn4-F3PUHpYOuws"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/tareas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "tareas"
+          ]
+        },
+        "description": "JWT con rol ADMIN firmado con una clave distinta a la del servidor."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+              "pm.test('codigo = TOKEN_INVALIDO', () => pm.expect(pm.response.json().codigo).to.eql('TOKEN_INVALIDO'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 GET tareas token EXPIRADO",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJlYTJhZjU1NS02Y2M4LTRiZTQtODgxZi04NjUzMDgzMDdjMGMiLCJpc3MiOiJzaXN0ZW1hLXRhcmVhcyIsInN1YiI6Implc3VzIiwicm9sIjoiVVNVQVJJTyIsImlhdCI6MTc5NDk2MDAwMCwiZXhwIjoxNzk0OTYwOTAwfQ.lgy8_3aYtQ_pP4-43j4yaOjNdSbUziwCMGlqHTzAN8c"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/tareas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "tareas"
+          ]
+        },
+        "description": "JWT legítimo cuyo exp ya pasó."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+              "pm.test('codigo = TOKEN_EXPIRADO', () => pm.expect(pm.response.json().codigo).to.eql('TOKEN_EXPIRADO'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 POST tarea con token válido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAdmin}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/tareas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "tareas"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Preparar reporte\",\n  \"descripcion\": \"Autenticación JWT\",\n  \"estado\": \"PENDIENTE\",\n  \"prioridad\": \"ALTA\",\n  \"responsable\": \"Jesus\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('idTarea', pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 GET tareas con token válido",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAdmin}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/tareas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "tareas"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Login USUARIO",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "description": "",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"jesus\",\n  \"password\": \"Usuario123*\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('tokenUsuario', pm.response.json().accessToken);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 DELETE con rol USUARIO (403)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenUsuario}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/tareas/{{idTarea}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "tareas",
+            "{{idTarea}}"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 403', () => pm.response.to.have.status(403));",
+              "pm.test('codigo = ACCESO_DENEGADO', () => pm.expect(pm.response.json().codigo).to.eql('ACCESO_DENEGADO'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 Refresh (renovar token)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/refresh",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "refresh"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+              "pm.test('Token nuevo distinto', () => pm.expect(pm.response.json().accessToken).to.not.eql(pm.collectionVariables.get('tokenUsuario')));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 Logout",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/logout",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "logout"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 204', () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 Refresh después de logout (401)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/refresh",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "refresh"
+          ]
+        },
+        "description": ""
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+              "pm.test('codigo = CREDENCIALES_INVALIDAS', () => pm.expect(pm.response.json().codigo).to.eql('CREDENCIALES_INVALIDAS'));"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "tokenAdmin",
+      "value": ""
+    },
+    {
+      "key": "tokenUsuario",
+      "value": ""
+    },
+    {
+      "key": "idTarea",
+      "value": "1"
+    }
+  ]
+}

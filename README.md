@@ -81,6 +81,35 @@ La consola de H2 queda en `http://localhost:8080/h2-console`. JDBC URL: `jdbc:h2
 - `PATCH /api/tareas/{id}/prioridad` con `{ "prioridad": "ALTA" }` cambia solo la prioridad.
 - `PATCH /api/tareas/{id}/responsable` con `{ "responsable": "Ana" }` cambia solo el responsable. Los espacios al inicio y al final se ignoran.
 
+## Autenticación y autorización (JWT)
+
+La API está protegida con **Spring Security** y **JSON Web Tokens**:
+
+- `POST /api/auth/login` con `{ "username": "...", "password": "..." }` devuelve un *access token* JWT (15 min) y deja el *refresh token* (7 días) en una cookie `HttpOnly`, `SameSite=Strict`, con `Path=/api/auth`.
+- Toda ruta `/api/tareas/**` exige `Authorization: Bearer <accessToken>`. `DELETE` solo lo puede hacer el rol `ADMIN`.
+- `POST /api/auth/refresh` usa la cookie para entregar un access token nuevo y **rota** el refresh token (el anterior queda revocado; si alguien lo reutiliza, se cierran todas las sesiones de ese usuario).
+- `POST /api/auth/logout` revoca el refresh token y borra la cookie.
+- `GET /api/auth/me` devuelve el usuario y los roles del token.
+
+Errores en JSON: `401` con `codigo` = `SIN_CREDENCIALES`, `TOKEN_INVALIDO`, `TOKEN_EXPIRADO` o `CREDENCIALES_INVALIDAS`; `403` con `ACCESO_DENEGADO`.
+
+Usuarios de prueba (se crean al arrancar, solo desarrollo):
+
+| Usuario | Contraseña | Rol |
+| --- | --- | --- |
+| `admin` | `Admin123*` | ADMIN |
+| `jesus` | `Usuario123*` | USUARIO |
+
+La clave de firma se toma de la variable de entorno `JWT_SECRET` (Base64, mínimo 256 bits); el valor de `application.properties` es solo para desarrollo. En producción también hay que poner `jwt.cookie-segura=true` (HTTPS).
+
+Pruebas de seguridad:
+
+- Automáticas: `.\mvnw.cmd "-Dtest=SeguridadAutenticacionTest" test`
+- Postman: importar `docs/autenticacion.postman_collection.json` y ejecutar la colección en orden.
+- PowerShell 7: `.\docs\pruebas-seguridad.ps1` con el backend levantado.
+
+En el frontend, `authInterceptor` agrega el encabezado `Bearer` y, ante un `401`, renueva el token y repite la petición; `authGuard` manda a `/login` si no hay sesión. El access token vive solo en memoria.
+
 ## Guía de pruebas de funcionamiento
 
 La base H2 está en memoria y arranca vacía. Cada reinicio del backend borra las tareas. Primero hay que registrar alguna.
@@ -108,10 +137,12 @@ En PowerShell las comillas alrededor de `-Dtest=...` son necesarias.
 
 ### Pruebas por la API
 
-Con el backend en el puerto 8080, en otra terminal de PowerShell:
+Con el backend en el puerto 8080, en otra terminal de PowerShell. Primero se obtiene un token y se envía en cada petición:
 
 ```powershell
 $base = "http://localhost:8080/api/tareas"
+$token = (Invoke-RestMethod -Method Post -Uri "http://localhost:8080/api/auth/login" -ContentType "application/json" -Body '{"username":"admin","password":"Admin123*"}').accessToken
+$PSDefaultParameterValues["Invoke-RestMethod:Headers"] = @{ Authorization = "Bearer $token" }
 
 $creada = Invoke-RestMethod -Method Post -Uri $base -ContentType "application/json" -Body '{"titulo":"Preparar reporte","descripcion":"Prueba manual","estado":"PENDIENTE","prioridad":"ALTA","responsable":"Ana"}'
 $id = $creada.id

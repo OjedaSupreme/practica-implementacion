@@ -205,7 +205,9 @@
                 </td>
                 <td class="acciones-fila">
                   <button type="button" class="secundario" (click)="abrirEdicion(tarea)">Editar</button>
-                  <button type="button" class="eliminar" (click)="eliminar(tarea)">Eliminar</button>
+                  @if (auth.esAdmin()) {
+                    <button type="button" class="eliminar" (click)="eliminar(tarea)">Eliminar</button>
+                  }
                 </td>
               </tr>
             }
