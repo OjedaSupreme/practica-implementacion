@@ -1,0 +1,49 @@
+# Blueprint de Render: infraestructura como código para el despliegue en la nube.
+# Crea el servidor de base de datos (PostgreSQL administrado) y dos servicios web con Docker.
+
+databases:
+  - name: tareas-ojeda-db
+    plan: free
+    region: oregon
+    databaseName: tareasdb
+    user: tareas
+    postgresMajorVersion: "16"
+
+services:
+  # Servidor de aplicaciones: API REST Spring Boot (backend/Dockerfile)
+  - type: web
+    name: tareas-ojeda-api
+    runtime: docker
+    plan: free
+    region: oregon
+    rootDir: backend
+    dockerfilePath: ./backend/Dockerfile   # rutas relativas a la raíz del repositorio
+    dockerContext: ./backend
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DATABASE_URL              # cadena interna de PostgreSQL; docker-entrypoint.sh la convierte a JDBC
+        fromDatabase:
+          name: tareas-ojeda-db
+          property: connectionString
+      - key: JWT_SECRET                # clave aleatoria de 256 bits generada por Render
+        generateValue: true
+      - key: CORS_ORIGINS              # dominio público del frontend, p. ej. https://tareas-ojeda-web.onrender.com
+        sync: false
+      - key: APP_ADMIN_PASSWORD        # se capturan en el panel al crear el servicio
+        sync: false
+      - key: APP_USUARIO_PASSWORD
+        sync: false
+
+  # Servidor web: Nginx con Angular y proxy inverso hacia la API (frontend/Dockerfile)
+  - type: web
+    name: tareas-ojeda-web
+    runtime: docker
+    plan: free
+    region: oregon
+    rootDir: frontend
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    healthCheckPath: /
+    envVars:
+      - key: API_URL                   # URL pública (HTTPS) de tareas-ojeda-api, p. ej. https://tareas-ojeda-api.onrender.com
+        sync: false

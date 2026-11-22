@@ -1,7 +1,9 @@
 package com.equipo.sistematareas.config;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -52,6 +54,8 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/refresh", "/api/auth/logout")
 						.permitAll()
 						.requestMatchers("/h2-console/**", "/error").permitAll()
+						// Health check que consultan Docker y el host para saber si el contenedor está sano.
+						.requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
 						.requestMatchers(HttpMethod.DELETE, "/api/tareas/**").hasRole("ADMIN")
 						.requestMatchers("/api/**").hasAnyRole("ADMIN", "USUARIO")
 						.anyRequest().authenticated())
@@ -90,11 +94,18 @@ public class SecurityConfig {
 		return configuracion.getAuthenticationManager();
 	}
 
-	/** CORS para el frontend Angular en desarrollo. */
+	/**
+	 * CORS. En desarrollo el origen es Angular en el puerto 4200; en producción, el dominio del frontend
+	 * (variable CORS_ORIGINS). Un valor sin esquema, como el que entrega el host, se toma como https://.
+	 */
 	@Bean
-	public CorsConfigurationSource corsConfigurationSource() {
+	public CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.origenes}") String origenes) {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("http://localhost:4200"));
+		config.setAllowedOrigins(Arrays.stream(origenes.split(","))
+				.map(String::trim)
+				.filter(o -> !o.isEmpty())
+				.map(o -> o.startsWith("http://") || o.startsWith("https://") ? o : "https://" + o)
+				.toList());
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 		config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 		config.setExposedHeaders(List.of("WWW-Authenticate"));

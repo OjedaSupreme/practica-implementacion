@@ -21,7 +21,8 @@ Este repositorio es la evidencia principal del proceso de control de versiones. 
 - Backend: Spring Boot (API REST)
 - Java 21
 - Node.js 20.19 o superior (también sirve Node.js 22)
-- Base de datos: H2 en memoria
+- Base de datos: H2 en memoria (desarrollo) y PostgreSQL 16 (contenedores y producción)
+- Contenedores: Docker, Docker Compose y Render
 - Plataforma: GitHub
 - Flujo: GitHub Flow
 
@@ -109,6 +110,39 @@ Pruebas de seguridad:
 - PowerShell 7: `.\docs\pruebas-seguridad.ps1` con el backend levantado.
 
 En el frontend, `authInterceptor` agrega el encabezado `Bearer` y, ante un `401`, renueva el token y repite la petición; `authGuard` manda a `/login` si no hay sesión. El access token vive solo en memoria.
+
+## Despliegue con contenedores
+
+La aplicación se ejecuta en tres contenedores:
+
+| Contenedor | Imagen | Función |
+| --- | --- | --- |
+| `frontend` | `frontend/Dockerfile` (Node 22 → Nginx) | Sirve Angular y reenvía `/api` al backend (proxy inverso). |
+| `backend` | `backend/Dockerfile` (Maven → JRE 21) | API REST Spring Boot con el perfil `prod`. |
+| `db` | `postgres:16-alpine` | Servidor de base de datos con volumen persistente. |
+
+### Local (Docker Desktop)
+
+```powershell
+docker compose up -d --build
+docker compose ps
+```
+
+Abre `http://localhost:8081`. Para detener: `docker compose down` (agrega `-v` para borrar también los datos).
+
+### Nube (Render)
+
+`render.yaml` es un *Blueprint*: crea la base PostgreSQL administrada y los dos servicios web con Docker. Render publica cada servicio en un subdominio `onrender.com` con certificado TLS administrado y renovación automática.
+
+Variables de entorno:
+
+| Variable | Servicio | Valor |
+| --- | --- | --- |
+| `DATABASE_URL` | API | Cadena interna de PostgreSQL (la convierte `docker-entrypoint.sh`). |
+| `JWT_SECRET` | API | Generada por Render. |
+| `CORS_ORIGINS` | API | URL del frontend, p. ej. `https://tareas-ojeda-web.onrender.com`. |
+| `APP_ADMIN_PASSWORD`, `APP_USUARIO_PASSWORD` | API | Contraseñas iniciales de `admin` y `jesus`. |
+| `API_URL` | Web | URL de la API, p. ej. `https://tareas-ojeda-api.onrender.com`. |
 
 ## Guía de pruebas de funcionamiento
 

@@ -1,0 +1,46 @@
+# Plantilla de Nginx. Al arrancar el contenedor, envsubst reemplaza ${PORT}, ${API_URL}
+# y ${NGINX_LOCAL_RESOLVERS}; las variables propias de Nginx (como $uri) no se tocan.
+
+server {
+    listen ${PORT};
+    server_name _;
+
+    root  /usr/share/nginx/html;
+    index index.html;
+
+    # DNS del contenedor: el nombre del backend se resuelve en cada petición y no solo al arrancar.
+    resolver ${NGINX_LOCAL_RESOLVERS} valid=30s ipv6=off;
+    set $api_upstream ${API_URL};
+
+    # Encabezados de seguridad. HSTS obliga al navegador a usar siempre HTTPS durante un año.
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    server_tokens off;
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+
+    # Proxy inverso: /api/... se reenvía al contenedor del backend con la misma ruta.
+    location /api/ {
+        proxy_pass $api_upstream;
+        proxy_http_version 1.1;
+        proxy_ssl_server_name on;          # envía SNI cuando el backend se publica con HTTPS
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_connect_timeout 60s;
+        proxy_read_timeout 120s;           # la instancia gratuita tarda en "despertar"
+    }
+
+    # Archivos con hash en el nombre: se pueden guardar en cache del navegador.
+    location ~* \.(?:js|css|ico|png|svg|woff2?)$ {
+        expires 30d;
+        try_files $uri =404;
+    }
+
+    # Aplicación de una sola página: cualquier otra ruta (/login, /tareas) carga index.html.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

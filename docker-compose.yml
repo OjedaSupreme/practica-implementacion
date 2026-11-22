@@ -1,0 +1,63 @@
+# Orquestación local de los tres contenedores del sistema de gestión de tareas.
+#   docker compose up -d --build      -> construye y levanta todo
+#   http://localhost:8081             -> aplicación (Nginx + Angular)
+# Las contraseñas de desarrollo se pueden cambiar en un archivo .env junto a este archivo.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tareas-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tareasdb
+      POSTGRES_USER: tareas
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-tareas_dev}
+    volumes:
+      - datos-postgres:/var/lib/postgresql/data   # persistencia: los datos sobreviven al contenedor
+    networks: [red-datos]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tareas -d tareasdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    image: sistema-tareas/backend:1.0
+    container_name: tareas-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy     # espera a que PostgreSQL acepte conexiones
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/tareasdb
+      SPRING_DATASOURCE_USERNAME: tareas
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-tareas_dev}
+      JWT_SECRET: ${JWT_SECRET:-c2lzdGVtYS10YXJlYXMtY2xhdmUtbG9jYWwtZG9ja2VyLWNvbXBvc2UtMjAyNg==}
+      JWT_COOKIE_SEGURA: "false"         # en local no hay HTTPS
+      CORS_ORIGINS: http://localhost:8081
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD:-Admin123*}
+      APP_USUARIO_PASSWORD: ${APP_USUARIO_PASSWORD:-Usuario123*}
+    networks: [red-datos, red-web]      # único contenedor conectado a las dos redes
+    # Sin "ports": la API solo es accesible desde la red interna, a través de Nginx.
+
+  frontend:
+    build: ./frontend
+    image: sistema-tareas/frontend:1.0
+    container_name: tareas-web
+    restart: unless-stopped
+    depends_on: [backend]
+    environment:
+      PORT: "80"
+      API_URL: http://backend:8080
+    ports:
+      - "8081:80"                       # único puerto publicado hacia el equipo anfitrión
+    networks: [red-web]
+
+networks:
+  red-datos:   # backend <-> PostgreSQL
+  red-web:     # Nginx <-> backend
+
+volumes:
+  datos-postgres:
